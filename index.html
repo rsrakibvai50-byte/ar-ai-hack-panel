@@ -1,34 +1,298 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Run the Hospital</title>
-    <meta charset='utf-8' />
-    <meta name='renderer' content='webkit' />
-    <meta name='viewport' content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no'
-    />
-    <meta name='apple-mobile-web-app-capable' content='yes' />
-    <meta name='full-screen' content='true' />
-    <meta name='x5-fullscreen' content='true' />
-    <meta name='360-fullscreen' content='true' />
-    <meta name='laya' screenorientation='landscape' />
-    <meta http-equiv='expires' content='0' />
-    <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1' />
-    <meta http-equiv='expires' content='0' />
-    <meta http-equiv='Cache-Control' content='no-siteapp' />
-</head>
-
-<body>
-    <script type="text/javascript">
-        function loadLib(url) {
-            var script = document.createElement("script");
-            script.async = false;
-            script.src = url;
-            document.body.appendChild(script);
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR AI HACK PANEL</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
         }
-        window.isFb = true;
-    </script>
-    <script type="text/javascript" src="minigame.js"></script>
-    <script type="text/javascript" src="index.js"></script>
-</body>
+        body, html {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: #000;
+            font-family: sans-serif;
+        }
+        /* Background Game Iframe */
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: 1;
+        }
+        /* Floating Widget */
+        #app-widget {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 260px;
+            background: linear-gradient(145deg, #0a0a0a, #1a1a2e);
+            border-radius: 20px;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            color: #fff;
+        }
+        .title {
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffcc00;
+            margin-bottom: 10px;
+            cursor: move;
+        }
+        .input-box {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1.5px solid #00ffcc;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 12px;
+            text-align: center;
+            outline: none;
+            margin-bottom: 10px;
+            user-select: text;
+        }
+        .btn {
+            width: 100%;
+            padding: 10px;
+            background: #00ffcc;
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        .telegram-btn {
+            background: #0088cc;
+            color: #fff;
+        }
+        #mainDashboard {
+            display: none;
+            text-align: center;
+        }
+        .prediction {
+            font-size: 26px;
+            font-weight: 900;
+            color: #00ffcc;
+            margin: 5px 0;
+        }
+        .lucky-num {
+            font-size: 14px;
+            color: #ffcc00;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .timer {
+            font-size: 14px;
+            color: #ffcc00;
+            margin-top: 2px;
+        }
+        .footer-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .footer-btns button {
+            flex: 1;
+            padding: 6px;
+            font-size: 10px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .exit-btn { background: #ff3355; color: #fff; }
+        .hide-btn { background: #00ffcc; color: #000; }
 
+        #show-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #00ffcc;
+            color: #000;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-weight: bold;
+            font-size: 11px;
+            cursor: move;
+            z-index: 9998;
+            display: none;
+            box-shadow: 0 0 15px rgba(0,255,204,0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Game Site Iframe -->
+    <iframe src="https://dkwin15.com/#/login"></iframe>
+
+    <!-- Floating AI Hack Panel Widget -->
+    <div id="app-widget">
+        <div class="title" id="panelHeader">AR AI HACK PANEL</div>
+
+        <!-- Login Screen with Password -->
+        <div id="login-screen">
+            <input type="password" id="passInput" class="input-box" placeholder="ENTER PASSWORD">
+            <button class="btn" onclick="checkLogin()">LOGIN NOW</button>
+            <button class="btn telegram-btn" onclick="openTelegram()">TELEGRAM</button>
+            <div id="status" style="font-size: 10px; color: #ff3355; text-align: center; margin-top: 4px;"></div>
+        </div>
+
+        <!-- Dashboard (Appears after correct password) -->
+        <div id="mainDashboard">
+            <div id="periodDisplay" style="font-size: 11px; color: #888;">PERIOD: --</div>
+            <div class="prediction" id="predictionBox">--</div>
+            <div class="lucky-num" id="luckyNumberBox">LUCKY: --</div>
+            <div class="timer" id="timerDisplay">00:30</div>
+            <div class="footer-btns">
+                <button class="exit-btn" onclick="location.reload()">EXIT</button>
+                <button class="hide-btn" onclick="hideWidget()">HIDE</button>
+            </div>
+        </div>
+    </div>
+
+    <button id="show-btn" onclick="showWidget()">SHOW</button>
+
+    <script>
+        const CORRECT_PASS = "Rakib@391";
+        let lastPeriod = "";
+
+        function checkLogin() {
+            const pass = document.getElementById('passInput').value.trim();
+            const status = document.getElementById('status');
+            if (pass === CORRECT_PASS) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('mainDashboard').style.display = 'block';
+                startEngine();
+            } else {
+                status.innerText = "Wrong Password!";
+            }
+        }
+
+        function openTelegram() {
+            window.open('https://t.me/+8801947320321', '_blank');
+        }
+
+        function startEngine() {
+            setInterval(() => {
+                const now = new Date();
+                const sec = now.getSeconds();
+                const remain = 30 - (sec % 30);
+                
+                document.getElementById('timerDisplay').innerText = "00:" + (remain < 10 ? "0" : "") + remain;
+                
+                const baseTime = Math.floor(now.getTime() / 1000);
+                const currentPeriod = String(now.getFullYear()) + 
+                                      String(now.getMonth()+1).padStart(2,'0') + 
+                                      String(now.getDate()).padStart(2,'0') + 
+                                      Math.floor(baseTime / 30);
+                
+                document.getElementById('periodDisplay').innerText = "PERIOD: " + currentPeriod;
+
+                if (currentPeriod !== lastPeriod) {
+                    lastPeriod = currentPeriod;
+                    
+                    const types = ['BIG ', 'SMALL '];
+                    const pred = types[Math.floor(Math.random() * types.length)];
+                    document.getElementById('predictionBox').innerText = pred;
+
+                    let lucky;
+                    if (pred.includes("BIG")) {
+                        lucky = Math.floor(Math.random() * 5) + 5;
+                    } else {
+                        lucky = Math.floor(Math.random() * 5);
+                    }
+                    document.getElementById('luckyNumberBox').innerText = "LUCKY: " + lucky;
+                }
+            }, 1000);
+        }
+
+        function hideWidget() {
+            document.getElementById('app-widget').style.display = 'none';
+            document.getElementById('show-btn').style.display = 'block';
+        }
+
+        function showWidget() {
+            document.getElementById('app-widget').style.display = 'flex';
+            document.getElementById('show-btn').style.display = 'none';
+        }
+
+        function makeDraggable(elmnt, handle) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            let dragItem = handle || elmnt;
+
+            dragItem.onmousedown = dragMouseDown;
+            dragItem.addEventListener('touchstart', dragTouchStart, { passive: true });
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+                elmnt.style.transform = "none";
+                elmnt.style.bottom = "auto";
+                elmnt.style.right = "auto";
+            }
+
+            function dragTouchStart(e) {
+                pos3 = e.touches[0].clientX;
+                pos4 = e.touches[0].clientY;
+                document.addEventListener('touchend', closeDragElement);
+                document.addEventListener('touchmove', elementTouchDrag, { passive: true });
+            }
+
+            function elementTouchDrag(e) {
+                pos1 = pos3 - e.touches[0].clientX;
+                pos2 = pos4 - e.touches[0].clientY;
+                pos3 = e.touches[0].clientX;
+                pos4 = e.touches[0].clientY;
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+                elmnt.style.transform = "none";
+                elmnt.style.bottom = "auto";
+                elmnt.style.right = "auto";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+                document.removeEventListener('touchend', closeDragElement);
+                document.removeEventListener('touchmove', elementTouchDrag);
+            }
+        }
+
+        makeDraggable(document.getElementById("app-widget"), document.getElementById("panelHeader"));
+        makeDraggable(document.getElementById("show-btn"));
+    </script>
+</body>
 </html>
