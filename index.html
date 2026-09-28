@@ -15,20 +15,40 @@
             width: 100%;
             height: 100vh;
             overflow: hidden;
-            background: #000;
+            background: #0b0f19;
             font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
         }
-        /* Background Game Iframe */
-        iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
+        .bg-panel {
+            text-align: center;
+            padding: 20px;
             z-index: 1;
         }
-        /* Floating Widget */
+        .bg-panel h2 {
+            color: #00ffcc;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        .bg-panel p {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        .game-link-btn {
+            padding: 12px 25px;
+            background: #ffcc00;
+            color: #000;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.4);
+        }
         #app-widget {
             position: fixed;
             top: 50%;
@@ -140,8 +160,11 @@
     </style>
 </head>
 <body>
-    <!-- Background Game Site Iframe -->
-    <iframe src="https://dkwin15.com/#/login"></iframe>
+    <div class="bg-panel">
+        <h2>AR AI HACK PANEL</h2>
+        <p>Click below to open the official game site in browser and login with your old ID.</p>
+        <button class="game-link-btn" onclick="openGameSite()">OPEN GAME SITE</button>
+    </div>
 
     <!-- Floating AI Hack Panel Widget -->
     <div id="app-widget">
@@ -155,12 +178,13 @@
             <div id="status" style="font-size: 10px; color: #ff3355; text-align: center; margin-top: 4px;"></div>
         </div>
 
-        <!-- Dashboard (Appears after correct password) -->
+        <!-- Dashboard -->
         <div id="mainDashboard">
             <div id="periodDisplay" style="font-size: 11px; color: #888;">PERIOD: --</div>
             <div class="prediction" id="predictionBox">--</div>
             <div class="lucky-num" id="luckyNumberBox">LUCKY: --</div>
             <div class="timer" id="timerDisplay">00:30</div>
+            <button class="btn" style="margin-top: 8px;" onclick="openGameSite()">OPEN GAME</button>
             <div class="footer-btns">
                 <button class="exit-btn" onclick="location.reload()">EXIT</button>
                 <button class="hide-btn" onclick="hideWidget()">HIDE</button>
@@ -173,6 +197,10 @@
     <script>
         const CORRECT_PASS = "Rakib@391";
         let lastPeriod = "";
+
+        function openGameSite() {
+            window.open('https://dkwin15.com/#/login', '_blank');
+        }
 
         function checkLogin() {
             const pass = document.getElementById('passInput').value.trim();
@@ -198,18 +226,20 @@
                 
                 document.getElementById('timerDisplay').innerText = "00:" + (remain < 10 ? "0" : "") + remain;
                 
-                const baseTime = Math.floor(now.getTime() / 1000);
+                // Synchronizing period calculation with standard 30s game intervals
+                const totalSeconds = Math.floor(now.getTime() / 1000);
+                const periodIndex = Math.floor(totalSeconds / 30);
                 const currentPeriod = String(now.getFullYear()) + 
                                       String(now.getMonth()+1).padStart(2,'0') + 
                                       String(now.getDate()).padStart(2,'0') + 
-                                      Math.floor(baseTime / 30);
+                                      "10" + String(periodIndex).slice(-5);
                 
                 document.getElementById('periodDisplay').innerText = "PERIOD: " + currentPeriod;
 
                 if (currentPeriod !== lastPeriod) {
                     lastPeriod = currentPeriod;
                     
-                    const types = ['BIG ', 'SMALL '];
+                    const types = ['BIG 🔴', 'SMALL 🟢'];
                     const pred = types[Math.floor(Math.random() * types.length)];
                     document.getElementById('predictionBox').innerText = pred;
 
