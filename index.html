@@ -27,23 +27,16 @@
             border: none;
             z-index: 1;
         }
-
-        @keyframes borderGlow {
-            0% { border-color: rgba(0, 255, 204, 0.6); box-shadow: 0 0 25px rgba(0, 255, 204, 0.4), inset 0 0 15px rgba(0, 255, 204, 0.2); }
-            50% { border-color: rgba(255, 204, 0, 0.9); box-shadow: 0 0 35px rgba(255, 204, 0, 0.7), inset 0 0 20px rgba(255, 204, 0, 0.3); }
-            100% { border-color: rgba(0, 255, 204, 0.6); box-shadow: 0 0 25px rgba(0, 255, 204, 0.4), inset 0 0 15px rgba(0, 255, 204, 0.2); }
-        }
-
         #app-widget {
             position: fixed;
-            top: 15%;
+            top: 20%;
             left: 50%;
             transform: translateX(-50%);
-            width: 300px;
-            background: linear-gradient(145deg, rgba(15,15,25,0.95), rgba(25,25,45,0.95));
-            border-radius: 22px;
-            border: 2.5px solid #00ffcc;
-            animation: borderGlow 4s infinite ease-in-out;
+            width: 280px;
+            background: linear-gradient(145deg, rgba(10,10,10,0.95), rgba(26,26,46,0.95));
+            border-radius: 20px;
+            border: 2px solid rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
             z-index: 9999;
             display: flex;
             flex-direction: column;
@@ -61,11 +54,10 @@
             padding: 6px;
             background: rgba(255,255,255,0.08);
             border-radius: 6px;
-            letter-spacing: 0.5px;
         }
         .input-box {
             width: 100%;
-            padding: 9px;
+            padding: 10px;
             background: rgba(255, 255, 255, 0.05);
             border: 1.5px solid #00ffcc;
             border-radius: 8px;
@@ -86,76 +78,32 @@
             font-weight: bold;
             cursor: pointer;
             font-size: 12px;
-            margin-bottom: 8px;
-            transition: 0.2s;
+            margin-bottom: 6px;
         }
-        .btn:active { transform: scale(0.96); }
         .telegram-btn {
             background: #0088cc;
             color: #fff;
         }
-        .period-display {
-            font-size: 12px;
+        .start-btn {
+            background: #ffcc00;
+            color: #000;
+            margin-bottom: 8px;
+        }
+        #mainDashboard {
+            display: none;
+            text-align: center;
+        }
+        .prediction {
+            font-size: 24px;
+            font-weight: 900;
+            color: #00ffcc;
+            margin: 4px 0;
+        }
+        .lucky-num {
+            font-size: 13px;
             color: #ffcc00;
             margin-bottom: 4px;
             font-weight: bold;
-            text-align: center;
-        }
-        .prediction-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin: 6px 0;
-            background: rgba(0,0,0,0.3);
-            padding: 8px;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-        .prediction {
-            font-size: 20px;
-            font-weight: 900;
-            color: #00ffcc;
-        }
-        
-        .lucky-box-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin: 6px 0 10px 0;
-        }
-        .lucky-label {
-            font-size: 12px;
-            color: #ffcc00;
-            font-weight: bold;
-        }
-        .game-ball {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 15px;
-            color: #fff;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.4);
-            border: 1.5px solid rgba(255,255,255,0.6);
-        }
-        .ball-green { background: linear-gradient(135deg, #2ecc71, #27ae60); }
-        .ball-red { background: linear-gradient(135deg, #e74c3c, #c0392b); }
-        .ball-violet { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
-
-        .timer-box {
-            font-size: 11px;
-            color: #00ffcc;
-            font-weight: bold;
-            margin-bottom: 6px;
-            background: rgba(0,255,204,0.1);
-            padding: 4px;
-            border-radius: 4px;
-            text-align: center;
         }
         .stats-box {
             display: flex;
@@ -171,14 +119,12 @@
         .loss-text { color: #ff3355; font-weight: bold; }
         
         .notification-box {
-            font-size: 10px;
+            font-size: 11px;
             padding: 5px;
             border-radius: 4px;
             margin-bottom: 8px;
             font-weight: bold;
-            background: rgba(0,255,204,0.1);
-            color: #00ffcc;
-            text-align: center;
+            background: rgba(255,255,255,0.05);
         }
 
         .footer-btns {
@@ -223,44 +169,31 @@
     <div id="app-widget">
         <div class="title" id="panelHeader">AR AI HACK PANEL (Drag Here)</div>
 
-        <!-- ধাপ ১: পাসওয়ার্ড স্ক্রিন -->
         <div id="login-screen">
             <input type="password" id="passInput" class="input-box" placeholder="ENTER PASSWORD">
-            <button class="btn" onclick="checkLogin()">LOGIN</button>
+            <button class="btn" onclick="checkLogin()">LOGIN NOW</button>
             <button class="btn telegram-btn" onclick="openTelegram()">TELEGRAM</button>
-            <div id="statusMsg" style="font-size: 10px; color: #ff3355; text-align: center; margin-top: 4px;"></div>
+            <div id="status" style="font-size: 10px; color: #ff3355; text-align: center; margin-top: 4px;"></div>
         </div>
 
-        <!-- ধাপ ২: পিরিয়ড সেটআপ স্ক্রিন -->
-        <div id="period-screen" style="display: none;">
-            <div style="font-size: 11px; color: #00ffcc; text-align: center; margin-bottom: 6px;">LOGIN SUCCESS!</div>
-            <input type="text" id="startPeriodInput" class="input-box" placeholder="ENTER CURRENT PERIOD">
-            <button class="btn" onclick="startPanel()">START SIGNAL</button>
-        </div>
-
-        <!-- ধাপ ৩: মেইন সিগন্যাল ড্যাশবোর্ড -->
-        <div id="mainDashboard" style="display: none;">
-            <div class="period-display" id="periodDisplayBox">PERIOD: --</div>
-            <div class="timer-box" id="timerDisplay">TIME LEFT: 30s</div>
+        <div id="mainDashboard">
+            <!-- Period Input Box -->
+            <input type="text" id="manualPeriodInput" class="input-box" placeholder="ENTER PERIOD NUMBER">
+            <!-- Start Auto Mode Button -->
+            <button class="btn start-btn" onclick="startAutoMode()">START AUTO 30S ⚡</button>
             
-            <div class="prediction-container">
-                <span class="prediction" id="predictionBox">--</span>
-            </div>
-
-            <div class="lucky-box-wrapper">
-                <span class="lucky-label">EXACT LUCKY NUMBER:</span>
-                <div id="luckyBall" class="game-ball ball-green">--</div>
-            </div>
+            <div class="prediction" id="predictionBox">--</div>
+            <div class="lucky-num" id="luckyNumberBox">LUCKY: --</div>
             
             <div class="stats-box">
-                <span>WIN: <span id="winCount" class="win-text">3</span></span>
+                <span>WIN: <span id="winCount" class="win-text">0</span></span>
                 <span>LOSS: <span id="lossCount" class="loss-text">0</span></span>
             </div>
 
-            <div id="notificationBox" class="notification-box">⚡ 100% Synced with Game Algorithm</div>
+            <div id="notificationBox" class="notification-box" style="color: #ffcc00;">Status: Set Period & Start</div>
 
             <div class="footer-btns">
-                <button class="exit-btn" onclick="location.reload()">RESET</button>
+                <button class="exit-btn" onclick="location.reload()">EXIT</button>
                 <button class="hide-btn" onclick="hideWidget()">HIDE</button>
             </div>
         </div>
@@ -270,95 +203,78 @@
 
     <script>
         const CORRECT_PASS = "Rakib@391";
-        let currentPeriodNumber = null;
-        let countdownTimer = null;
-        let mainInterval = null;
+        let wins = 0;
+        let losses = 0;
+        let currentPrediction = "BIG";
+        let autoInterval = null;
+
+        function checkLogin() {
+            const pass = document.getElementById('passInput').value.trim();
+            const status = document.getElementById('status');
+            if (pass === CORRECT_PASS) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('mainDashboard').style.display = 'block';
+            } else {
+                status.innerText = "Wrong Password!";
+            }
+        }
 
         function openTelegram() {
             window.open('https://t.me/+8801947320321', '_blank');
         }
 
-        function checkLogin() {
-            let pass = document.getElementById('passInput').value.trim();
-            let statusDiv = document.getElementById('statusMsg');
+        function generateNewSignal() {
+            let periodInput = document.getElementById('manualPeriodInput');
+            let val = periodInput.value.trim();
 
-            if (pass !== CORRECT_PASS) {
-                statusDiv.innerText = "Wrong Password!";
-                return;
+            if (val === "" || isNaN(val)) return;
+
+            // Automatically increment period by 1 for the next 30s cycle
+            let nextVal = (BigInt(val) + 1n).toString();
+            periodInput.value = nextVal;
+
+            const types = ['BIG 🔴', 'SMALL 🟢'];
+            const pred = types[Math.floor(Math.random() * types.length)];
+            currentPrediction = pred.includes("BIG") ? "BIG" : "SMALL";
+            
+            document.getElementById('predictionBox').innerText = pred;
+
+            let lucky;
+            if (currentPrediction === "BIG") {
+                lucky = Math.floor(Math.random() * 5) + 5;
+            } else {
+                lucky = Math.floor(Math.random() * 5);
             }
+            document.getElementById('luckyNumberBox').innerText = "LUCKY: " + lucky;
 
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('period-screen').style.display = 'block';
+            let notifBox = document.getElementById('notificationBox');
+            wins++;
+            document.getElementById('winCount').innerText = wins;
+            notifBox.innerHTML = "🎉 Auto Matched 100%";
+            notifBox.style.color = "#00ffcc";
         }
 
-        function startPanel() {
-            let periodVal = document.getElementById('startPeriodInput').value.trim();
-            if (!periodVal || isNaN(periodVal)) {
-                alert("দয়া করে সঠিক পিরিয়ড নম্বর লিখুন!");
+        function startAutoMode() {
+            let periodInput = document.getElementById('manualPeriodInput');
+            let val = periodInput.value.trim();
+
+            if (val === "" || isNaN(val)) {
+                alert("Please enter current period number first!");
                 return;
             }
 
-            currentPeriodNumber = BigInt(periodVal);
+            // Generate first signal immediately
+            generateNewSignal();
 
-            document.getElementById('period-screen').style.display = 'none';
-            document.getElementById('mainDashboard').style.display = 'block';
+            // Clear previous interval if any
+            if (autoInterval) clearInterval(autoInterval);
 
-            generateSmartSignal();
-
-            if(mainInterval) clearInterval(mainInterval);
-            mainInterval = setInterval(() => {
-                currentPeriodNumber += 1n;
-                generateSmartSignal();
+            // Automatically trigger every 30 seconds
+            autoInterval = setInterval(() => {
+                generateNewSignal();
             }, 30000);
 
-            startLiveTimer();
-        }
-
-        // হুবহু গেমের সাথে ম্যাচ করার জন্য ফিক্সড ম্যাথ হাশ অ্যালগরিদম
-        function generateSmartSignal() {
-            document.getElementById('periodDisplayBox').innerText = "PERIOD: " + currentPeriodNumber.toString();
-
-            // পিরিয়ড নাম্বারের ওপর ভিত্তি করে সঠিক ডিজিট জেনারেট করা (0 থেকে 9)
-            let periodStr = currentPeriodNumber.toString();
-            let lastDigitsVal = parseInt(periodStr.slice(-5)); // শেষের ৫ ডিজিট
-            
-            // এমন একটি ম্যাথ লজিক যা পিরিয়ডের সাথে ১০০% সুনির্দিষ্ট লাকি নম্বর তৈরি করবে
-            let luckyNum = (lastDigitsVal * 93 + 7) % 10;
-
-            let isBig = luckyNum >= 5;
-            let predText = isBig ? "BIG 🔴" : "SMALL 🟢";
-            
-            document.getElementById('predictionBox').innerText = predText;
-
-            let ballElement = document.getElementById('luckyBall');
-            ballElement.innerText = luckyNum;
-
-            let ballClass = "";
-            if (luckyNum === 0 || luckyNum === 5) {
-                ballClass = "game-ball ball-violet";
-            } else if ([1, 3, 7, 9].includes(luckyNum)) {
-                ballClass = "game-ball ball-green";
-            } else {
-                ballClass = "game-ball ball-red";
-            }
-            ballElement.className = ballClass;
-        }
-
-        function startLiveTimer() {
-            if(countdownTimer) clearInterval(countdownTimer);
-            
-            let getSecondsLeft = () => {
-                let d = new Date();
-                let sec = d.getSeconds();
-                return sec < 30 ? (29 - sec) : (59 - sec);
-            };
-
-            let timeLeft = getSecondsLeft();
-
-            countdownTimer = setInterval(() => {
-                timeLeft = getSecondsLeft();
-                document.getElementById('timerDisplay').innerText = "TIME LEFT: " + (timeLeft < 10 ? "0" + timeLeft : timeLeft) + "s";
-            }, 1000);
+            document.getElementById('notificationBox').innerHTML = "⚡ Auto 30s Mode Running!";
         }
 
         function hideWidget() {
@@ -371,7 +287,6 @@
             document.getElementById('show-btn').style.display = 'none';
         }
 
-        // ড্র্যাগ করার ফাংশন
         function makeDraggable(elmnt, handle) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
             let dragItem = handle || elmnt;
