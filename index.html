@@ -189,6 +189,7 @@
         .history-item span { font-weight: bold; }
         .win-tag { color: #00ffcc; }
         .loss-tag { color: #ff3355; }
+        .pending-tag { color: #ffcc00; }
         
         #historyModal button { margin-top: 8px; width: 100%; padding: 5px; font-size: 10px; background: #ff3355; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
 
@@ -302,7 +303,9 @@
                 if (lastSecond !== currentCycle) {
                     lastSecond = currentCycle;
                     if (currentActivePeriod !== null) {
-                        currentActivePeriod += 1n; // Auto increase period by 1
+                        // Timer sesh hole ager prediction er result finalize kora
+                        finalizePreviousPeriod();
+                        currentActivePeriod += 1n; // Next period
                         updatePanelData();
                     }
                 }
@@ -315,8 +318,9 @@
             
             document.getElementById('periodDisplayBox').innerText = "PERIOD: " + periodStr;
 
+            // Algorithm based on period last digit to make stable signal
             let lastDigitCode = parseInt(periodStr.slice(-1));
-            let luckyNum = lastDigitCode % 10;
+            let luckyNum = (lastDigitCode * 3 + 7) % 10; // Better pseudo spread
             let isBig = luckyNum >= 5;
             let predText = isBig ? "BIG" : "SMALL";
             
@@ -334,18 +338,34 @@
                 ballContainer.classList.add("ball-red");
             }
 
-            // History te log save kora (Simulated Win/Loss based on number pattern)
-            let isWin = (luckyNum % 2 === 0 && !isBig) || (luckyNum % 2 !== 0 && isBig) || (luckyNum === 0 || luckyNum === 5);
-            let resultStatus = isWin ? "WIN" : "LOSS";
-
+            // Push to history as PENDING initially, result will be checked after timer ends
             historyLogs.unshift({
                 period: periodStr,
                 prediction: predText,
                 number: luckyNum,
-                status: resultStatus
+                actualNum: null,
+                status: "PENDING"
             });
 
-            if (historyLogs.length > 20) historyLogs.pop(); // Keep last 20 records
+            if (historyLogs.length > 20) historyLogs.pop();
+        }
+
+        function finalizePreviousPeriod() {
+            if (historyLogs.length > 0 && historyLogs[0].status === "PENDING") {
+                // Generate simulated actual game outcome to compare with panel prediction
+                let item = historyLogs[0];
+                let randomActualNum = Math.floor(Math.random() * 10);
+                let actualIsBig = randomActualNum >= 5;
+                let actualPredText = actualIsBig ? "BIG" : "SMALL";
+
+                item.actualNum = randomActualNum;
+                // Check if panel prediction matches actual game result
+                if (item.prediction === actualPredText) {
+                    item.status = "WIN";
+                } else {
+                    item.status = "LOSS";
+                }
+            }
         }
 
         function openHistoryModal() {
@@ -358,11 +378,16 @@
                 historyLogs.forEach(item => {
                     let div = document.createElement('div');
                     div.className = 'history-item';
-                    let statusClass = item.status === "WIN" ? "win-tag" : "loss-tag";
+                    let statusClass = "pending-tag";
+                    if (item.status === "WIN") statusClass = "win-tag";
+                    else if (item.status === "LOSS") statusClass = "loss-tag";
+
+                    let details = item.status === "PENDING" ? `Pred: ${item.prediction} (${item.number})` : `Pred: ${item.prediction} | Act: ${item.actualNum}`;
+
                     div.innerHTML = `
                         <div>
                             <span style="color:#ffcc00;">${item.period}</span><br>
-                            <span>${item.prediction} (${item.number})</span>
+                            <span>${details}</span>
                         </div>
                         <span class="${statusClass}">${item.status}</span>
                     `;
