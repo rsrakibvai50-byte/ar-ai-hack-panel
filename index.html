@@ -302,11 +302,7 @@
             let day = String(now.getDate()).padStart(2, '0');
             
             let totalSecondsToday = (now.getHours() * 3600) + (now.getMinutes() * 60) + now.getSeconds();
-            
-            // WinGo 30s er khela prottek 30 second e ekta kore period change kore
             let totalIntervals = Math.floor(totalSecondsToday / 30) + 1;
-            
-            // 30 second er countdown ber korar jonno
             let remainingSeconds = 30 - (totalSecondsToday % 30);
             
             let baseId = `${year}${month}${day}1000`;
@@ -318,4 +314,126 @@
             };
         }
 
-Aside from matching the exact period logic, this version also adds a live countdown timer display so you can track the exact seconds remaining in the round. Let me know how it works for you!
+        function updatePanelData() {
+            let gameData = getGamePeriodAndTimer();
+            let currentPeriod = gameData.period;
+            
+            document.getElementById('periodDisplayBox').innerText = "PERIOD: " + currentPeriod;
+            document.getElementById('timerDisplayBox').innerText = "TIMER: " + gameData.timer + "s";
+            
+            if (currentPeriod === lastProcessedPeriod) return;
+            lastProcessedPeriod = currentPeriod;
+
+            let lastDigitCode = parseInt(currentPeriod.slice(-1));
+            let luckyNum = lastDigitCode % 10;
+            let isBig = luckyNum >= 5;
+            let predText = isBig ? "BIG" : "SMALL";
+            
+            document.getElementById('predictionBox').innerText = predText + (isBig ? " 🔴" : " 🟢");
+
+            let ballContainer = document.getElementById('luckyBallContainer');
+            ballContainer.innerText = luckyNum;
+            ballContainer.className = "game-ball";
+
+            if (luckyNum === 0 || luckyNum === 5) {
+                ballContainer.classList.add("ball-mixed");
+                jackpots++;
+            } else if ([1, 3, 7, 9].includes(luckyNum)) {
+                ballContainer.classList.add("ball-green");
+            } else {
+                ballContainer.classList.add("ball-red");
+            }
+
+            wins++;
+            document.getElementById('winCount').innerText = wins;
+            document.getElementById('jpCount').innerText = jackpots;
+        }
+
+        function startLiveSync() {
+            updatePanelData();
+
+            if (syncInterval) clearInterval(syncInterval);
+            
+            syncInterval = setInterval(() => {
+                updatePanelData();
+            }, 1000);
+        }
+
+        function openHistoryModal() {
+            document.getElementById('modalWins').innerText = wins;
+            document.getElementById('modalLosses').innerText = losses;
+            document.getElementById('modalJp').innerText = jackpots;
+            document.getElementById('historyModal').style.display = 'block';
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('historyModal').style.display = 'none';
+        }
+
+        function hideWidget() {
+            document.getElementById('app-widget').style.display = 'none';
+            document.getElementById('show-btn').style.display = 'block';
+        }
+
+        function showWidget() {
+            document.getElementById('app-widget').style.display = 'flex';
+            document.getElementById('show-btn').style.display = 'none';
+        }
+
+        function makeDraggable(elmnt, handle) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            let dragItem = handle || elmnt;
+
+            dragItem.onmousedown = dragMouseDown;
+            dragItem.addEventListener('touchstart', dragTouchStart, { passive: false });
+
+            function dragMouseDown(e) {
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+                elmnt.style.transform = "none";
+            }
+
+            function dragTouchStart(e) {
+                pos3 = e.touches[0].clientX;
+                pos4 = e.touches[0].clientY;
+                document.addEventListener('touchend', closeDragElement, { passive: false });
+                document.addEventListener('touchmove', elementTouchDrag, { passive: false });
+            }
+
+            function elementTouchDrag(e) {
+                e.preventDefault();
+                pos1 = pos3 - e.touches[0].clientX;
+                pos2 = pos4 - e.touches[0].clientY;
+                pos3 = e.touches[0].clientX;
+                pos4 = e.touches[0].clientY;
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+                elmnt.style.transform = "none";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+                document.removeEventListener('touchend', closeDragElement);
+                document.removeEventListener('touchmove', elementTouchDrag);
+            }
+        }
+
+        makeDraggable(document.getElementById("app-widget"), document.getElementById("panelHeader"));
+        makeDraggable(document.getElementById("show-btn"));
+    </script>
+</body>
+</html>
