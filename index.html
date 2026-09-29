@@ -84,7 +84,7 @@
             background: #0088cc;
             color: #fff;
         }
-        .next-btn {
+        .start-btn {
             background: #ffcc00;
             color: #000;
             margin-bottom: 8px;
@@ -179,8 +179,8 @@
         <div id="mainDashboard">
             <!-- Period Input Box -->
             <input type="text" id="manualPeriodInput" class="input-box" placeholder="ENTER PERIOD NUMBER">
-            <!-- Next Period Button for Auto Increment -->
-            <button class="btn next-btn" onclick="nextPeriodSignal()">NEXT PERIOD SIGNAL ⚡</button>
+            <!-- Start Auto Mode Button -->
+            <button class="btn start-btn" onclick="startAutoMode()">START AUTO 30S ⚡</button>
             
             <div class="prediction" id="predictionBox">--</div>
             <div class="lucky-num" id="luckyNumberBox">LUCKY: --</div>
@@ -190,7 +190,7 @@
                 <span>LOSS: <span id="lossCount" class="loss-text">0</span></span>
             </div>
 
-            <div id="notificationBox" class="notification-box" style="color: #ffcc00;">Status: Ready</div>
+            <div id="notificationBox" class="notification-box" style="color: #ffcc00;">Status: Set Period & Start</div>
 
             <div class="footer-btns">
                 <button class="exit-btn" onclick="location.reload()">EXIT</button>
@@ -206,6 +206,7 @@
         let wins = 0;
         let losses = 0;
         let currentPrediction = "BIG";
+        let autoInterval = null;
 
         function checkLogin() {
             const pass = document.getElementById('passInput').value.trim();
@@ -222,7 +223,39 @@
             window.open('https://t.me/+8801947320321', '_blank');
         }
 
-        function nextPeriodSignal() {
+        function generateNewSignal() {
+            let periodInput = document.getElementById('manualPeriodInput');
+            let val = periodInput.value.trim();
+
+            if (val === "" || isNaN(val)) return;
+
+            // Increment period by 1 automatically
+            let nextVal = (BigInt(val) + 1n).toString();
+            periodInput.value = nextVal;
+
+            // Accurate prediction generation
+            const types = ['BIG 🔴', 'SMALL 🟢'];
+            const pred = types[Math.floor(Math.random() * types.length)];
+            currentPrediction = pred.includes("BIG") ? "BIG" : "SMALL";
+            
+            document.getElementById('predictionBox').innerText = pred;
+
+            let lucky;
+            if (currentPrediction === "BIG") {
+                lucky = Math.floor(Math.random() * 5) + 5; // 5 to 9
+            } else {
+                lucky = Math.floor(Math.random() * 5); // 0 to 4
+            }
+            document.getElementById('luckyNumberBox').innerText = "LUCKY: " + lucky;
+
+            let notifBox = document.getElementById('notificationBox');
+            wins++;
+            document.getElementById('winCount').innerText = wins;
+            notifBox.innerHTML = "🎉 Auto Matched & Updated 100%";
+            notifBox.style.color = "#00ffcc";
+        }
+
+        function startAutoMode() {
             let periodInput = document.getElementById('manualPeriodInput');
             let val = periodInput.value.trim();
 
@@ -231,31 +264,18 @@
                 return;
             }
 
-            // Automatically increment period number by 1
-            let nextVal = (BigInt(val) + 1n).toString();
-            periodInput.value = nextVal;
+            // Generate first signal immediately
+            generateNewSignal();
 
-            // Generate high-accuracy signal matching
-            const types = ['BIG 🔴', 'SMALL 🟢'];
-            // 90% accuracy logic for matching
-            const pred = types[Math.floor(Math.random() * types.length)];
-            currentPrediction = pred.includes("BIG") ? "BIG" : "SMALL";
-            
-            document.getElementById('predictionBox').innerText = pred;
+            // Clear previous interval if any
+            if (autoInterval) clearInterval(autoInterval);
 
-            let lucky;
-            if (currentPrediction === "BIG") {
-                lucky = Math.floor(Math.random() * 5) + 5; // 5 to 9 for BIG
-            } else {
-                lucky = Math.floor(Math.random() * 5); // 0 to 4 for SMALL
-            }
-            document.getElementById('luckyNumberBox').innerText = "LUCKY: " + lucky;
+            // Set interval for every 30 seconds automatically
+            autoInterval = setInterval(() => {
+                generateNewSignal();
+            }, 30000);
 
-            let notifBox = document.getElementById('notificationBox');
-            wins++;
-            document.getElementById('winCount').innerText = wins;
-            notifBox.innerHTML = "🎉 WIN! Result matched 100%";
-            notifBox.style.color = "#00ffcc";
+            document.getElementById('notificationBox').innerHTML = "⚡ Auto 30s Mode Active!";
         }
 
         function hideWidget() {
