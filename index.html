@@ -18,7 +18,6 @@
             background: #0b0f19;
             font-family: sans-serif;
         }
-        /* Background Game Iframe */
         #gameFrame {
             position: fixed;
             top: 0;
@@ -28,7 +27,6 @@
             border: none;
             z-index: 1;
         }
-        /* Floating AI Hack Panel Widget */
         #app-widget {
             position: fixed;
             top: 20%;
@@ -102,12 +100,6 @@
             margin-bottom: 4px;
             font-weight: bold;
         }
-        .timer {
-            font-size: 13px;
-            color: #ffcc00;
-            margin-top: 2px;
-            margin-bottom: 8px;
-        }
         .stats-box {
             display: flex;
             justify-content: space-around;
@@ -167,14 +159,11 @@
 </head>
 <body>
 
-    <!-- Background Auto Game Site Iframe -->
     <iframe id="gameFrame" src="https://dkwin15.com/#/login"></iframe>
 
-    <!-- Floating AI Hack Panel Widget -->
     <div id="app-widget">
         <div class="title" id="panelHeader">AR AI HACK PANEL (Drag Here)</div>
 
-        <!-- Login Screen with Password -->
         <div id="login-screen">
             <input type="password" id="passInput" class="input-box" placeholder="ENTER PASSWORD">
             <button class="btn" onclick="checkLogin()">LOGIN NOW</button>
@@ -182,19 +171,19 @@
             <div id="status" style="font-size: 10px; color: #ff3355; text-align: center; margin-top: 4px;"></div>
         </div>
 
-        <!-- Dashboard -->
         <div id="mainDashboard">
-            <div id="periodDisplay" style="font-size: 10px; color: #aaa;">PERIOD: --</div>
+            <!-- Manual Period Input Box -->
+            <input type="text" id="manualPeriodInput" class="input-box" placeholder="ENTER PERIOD NUMBER" oninput="generateSignal()">
+            
             <div class="prediction" id="predictionBox">--</div>
             <div class="lucky-num" id="luckyNumberBox">LUCKY: --</div>
-            <div class="timer" id="timerDisplay">00:30</div>
             
             <div class="stats-box">
                 <span>WIN: <span id="winCount" class="win-text">0</span></span>
                 <span>LOSS: <span id="lossCount" class="loss-text">0</span></span>
             </div>
 
-            <div id="notificationBox" class="notification-box" style="color: #ffcc00;">Status: Waiting...</div>
+            <div id="notificationBox" class="notification-box" style="color: #ffcc00;">Status: Enter Period</div>
 
             <div class="footer-btns">
                 <button class="exit-btn" onclick="location.reload()">EXIT</button>
@@ -218,7 +207,6 @@
             if (pass === CORRECT_PASS) {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('mainDashboard').style.display = 'block';
-                startEngine();
             } else {
                 status.innerText = "Wrong Password!";
             }
@@ -228,57 +216,42 @@
             window.open('https://t.me/+8801947320321', '_blank');
         }
 
-        function startEngine() {
-            setInterval(() => {
-                const now = new Date();
-                const sec = now.getSeconds();
-                const remain = 30 - (sec % 30);
-                
-                document.getElementById('timerDisplay').innerText = "00:" + (remain < 10 ? "0" : "") + remain;
-                
-                const totalSeconds = Math.floor(now.getTime() / 1000);
-                const periodIndex = Math.floor(totalSeconds / 30);
-                const currentPeriod = String(now.getFullYear()) + 
-                                      String(now.getMonth()+1).padStart(2,'0') + 
-                                      String(now.getDate()).padStart(2,'0') + 
-                                      "10" + String(periodIndex).slice(-5);
-                
-                document.getElementById('periodDisplay').innerText = "PERIOD: " + currentPeriod;
-
-                if (currentPeriod !== lastPeriod) {
-                    if (lastPeriod !== "") {
-                        let actualResult = Math.random() > 0.4 ? currentPrediction : (currentPrediction === "BIG" ? "SMALL" : "BIG");
-                        let notifBox = document.getElementById('notificationBox');
-                        
-                        if (actualResult === currentPrediction) {
-                            wins++;
-                            document.getElementById('winCount').innerText = wins;
-                            notifBox.innerHTML = "🎉 WIN! Result matched";
-                            notifBox.style.color = "#00ffcc";
-                        } else {
-                            losses++;
-                            document.getElementById('lossCount').innerText = losses;
-                            notifBox.innerHTML = "❌ LOSS! Result did not match";
-                            notifBox.style.color = "#ff3355";
-                        }
-                    }
-
-                    lastPeriod = currentPeriod;
-                    const types = ['BIG 🔴', 'SMALL 🟢'];
-                    const pred = types[Math.floor(Math.random() * types.length)];
-                    currentPrediction = pred.includes("BIG") ? "BIG" : "SMALL";
+        function generateSignal() {
+            const periodVal = document.getElementById('manualPeriodInput').value.trim();
+            
+            if (periodVal.length > 5 && periodVal !== lastPeriod) {
+                if (lastPeriod !== "") {
+                    let actualResult = Math.random() > 0.4 ? currentPrediction : (currentPrediction === "BIG" ? "SMALL" : "BIG");
+                    let notifBox = document.getElementById('notificationBox');
                     
-                    document.getElementById('predictionBox').innerText = pred;
-
-                    let lucky;
-                    if (currentPrediction === "BIG") {
-                        lucky = Math.floor(Math.random() * 5) + 5;
+                    if (actualResult === currentPrediction) {
+                        wins++;
+                        document.getElementById('winCount').innerText = wins;
+                        notifBox.innerHTML = "🎉 WIN! Result matched";
+                        notifBox.style.color = "#00ffcc";
                     } else {
-                        lucky = Math.floor(Math.random() * 5);
+                        losses++;
+                        document.getElementById('lossCount').innerText = losses;
+                        notifBox.innerHTML = "❌ LOSS! Result did not match";
+                        notifBox.style.color = "#ff3355";
                     }
-                    document.getElementById('luckyNumberBox').innerText = "LUCKY: " + lucky;
                 }
-            }, 1000);
+
+                lastPeriod = periodVal;
+                const types = ['BIG 🔴', 'SMALL 🟢'];
+                const pred = types[Math.floor(Math.random() * types.length)];
+                currentPrediction = pred.includes("BIG") ? "BIG" : "SMALL";
+                
+                document.getElementById('predictionBox').innerText = pred;
+
+                let lucky;
+                if (currentPrediction === "BIG") {
+                    lucky = Math.floor(Math.random() * 5) + 5;
+                } else {
+                    lucky = Math.floor(Math.random() * 5);
+                }
+                document.getElementById('luckyNumberBox').innerText = "LUCKY: " + lucky;
+            }
         }
 
         function hideWidget() {
@@ -291,7 +264,6 @@
             document.getElementById('show-btn').style.display = 'none';
         }
 
-        // Draggable logic for touch & mouse
         function makeDraggable(elmnt, handle) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
             let dragItem = handle || elmnt;
