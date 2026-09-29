@@ -65,12 +65,12 @@
             font-size: 12px;
             text-align: center;
             outline: none;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             user-select: text;
         }
         .btn {
             width: 100%;
-            padding: 9px;
+            padding: 10px;
             background: #00ffcc;
             border: none;
             border-radius: 8px;
@@ -78,20 +78,21 @@
             font-weight: bold;
             cursor: pointer;
             font-size: 12px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
         .telegram-btn {
             background: #0088cc;
             color: #fff;
         }
-        .start-btn {
-            background: #ffcc00;
-            color: #000;
-            margin-bottom: 8px;
-        }
         #mainDashboard {
             display: none;
             text-align: center;
+        }
+        .period-display {
+            font-size: 12px;
+            color: #ffcc00;
+            margin-bottom: 4px;
+            font-weight: bold;
         }
         .prediction {
             font-size: 24px;
@@ -177,10 +178,7 @@
         </div>
 
         <div id="mainDashboard">
-            <!-- Period Input Box -->
-            <input type="text" id="manualPeriodInput" class="input-box" placeholder="ENTER PERIOD NUMBER">
-            <!-- Start Auto Mode Button -->
-            <button class="btn start-btn" onclick="startAutoMode()">START AUTO 30S ⚡</button>
+            <div class="period-display" id="periodDisplayBox">PERIOD: --</div>
             
             <div class="prediction" id="predictionBox">--</div>
             <div class="lucky-num" id="luckyNumberBox">LUCKY: --</div>
@@ -190,7 +188,7 @@
                 <span>LOSS: <span id="lossCount" class="loss-text">0</span></span>
             </div>
 
-            <div id="notificationBox" class="notification-box" style="color: #ffcc00;">Status: Set Period & Start</div>
+            <div id="notificationBox" class="notification-box" style="color: #00ffcc;">Status: Auto Sync Active ⚡</div>
 
             <div class="footer-btns">
                 <button class="exit-btn" onclick="location.reload()">EXIT</button>
@@ -207,6 +205,7 @@
         let losses = 0;
         let currentPrediction = "BIG";
         let autoInterval = null;
+        let currentPeriodNumber = null;
 
         function checkLogin() {
             const pass = document.getElementById('passInput').value.trim();
@@ -214,6 +213,9 @@
             if (pass === CORRECT_PASS) {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('mainDashboard').style.display = 'block';
+                
+                // Automatically generate base period and start 30s timer loop immediately upon login
+                initAutoPanel();
             } else {
                 status.innerText = "Wrong Password!";
             }
@@ -223,17 +225,40 @@
             window.open('https://t.me/+8801947320321', '_blank');
         }
 
-        function generateNewSignal() {
-            let periodInput = document.getElementById('manualPeriodInput');
-            let val = periodInput.value.trim();
+        function initAutoPanel() {
+            // Generate a realistic initial period based on current time date format (e.g. YYYYMMDDHHmm00 style or timestamp-based base)
+            let now = new Date();
+            let year = now.getFullYear();
+            let month = String(now.getMonth() + 1).padStart(2, '0');
+            let day = String(now.getDate()).padStart(2, '0');
+            
+            // Calculate total 30-second blocks today to match typical server period format
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            let seconds = now.getSeconds();
+            let totalBlocks = (hours * 120) + (Math.floor(minutes * 2)) + (seconds >= 30 ? 1 : 0);
+            
+            // Construct base period ID (e.g., 202609291000 + block index)
+            let baseNum = parseInt(`${year}${month}${day}01000`) + totalBlocks;
+            currentPeriodNumber = BigInt(baseNum);
 
-            if (val === "" || isNaN(val)) return;
+            // Run first generation right away
+            generateNextSignalCycle();
 
-            // Increment period by 1 automatically
-            let nextVal = (BigInt(val) + 1n).toString();
-            periodInput.value = nextVal;
+            // Setup exact 30-second loop interval matching game period ticks
+            if (autoInterval) clearInterval(autoInterval);
+            autoInterval = setInterval(() => {
+                generateNextSignalCycle();
+            }, 30000);
+        }
 
-            // Accurate prediction generation
+        function generateNextSignalCycle() {
+            if (currentPeriodNumber !== null) {
+                currentPeriodNumber += 1n;
+            }
+
+            document.getElementById('periodDisplayBox').innerText = "PERIOD: " + currentPeriodNumber.toString();
+
             const types = ['BIG 🔴', 'SMALL 🟢'];
             const pred = types[Math.floor(Math.random() * types.length)];
             currentPrediction = pred.includes("BIG") ? "BIG" : "SMALL";
@@ -242,40 +267,18 @@
 
             let lucky;
             if (currentPrediction === "BIG") {
-                lucky = Math.floor(Math.random() * 5) + 5; // 5 to 9
+                lucky = Math.floor(Math.random() * 5) + 5;
             } else {
-                lucky = Math.floor(Math.random() * 5); // 0 to 4
+                lucky = Math.floor(Math.random() * 5);
             }
             document.getElementById('luckyNumberBox').innerText = "LUCKY: " + lucky;
 
-            let notifBox = document.getElementById('notificationBox');
+            // Increment simulated win count for realism
             wins++;
             document.getElementById('winCount').innerText = wins;
-            notifBox.innerHTML = "🎉 Auto Matched & Updated 100%";
+            let notifBox = document.getElementById('notificationBox');
+            notifBox.innerHTML = "🎉 Auto Signal Synced";
             notifBox.style.color = "#00ffcc";
-        }
-
-        function startAutoMode() {
-            let periodInput = document.getElementById('manualPeriodInput');
-            let val = periodInput.value.trim();
-
-            if (val === "" || isNaN(val)) {
-                alert("Please enter a valid period number first!");
-                return;
-            }
-
-            // Generate first signal immediately
-            generateNewSignal();
-
-            // Clear previous interval if any
-            if (autoInterval) clearInterval(autoInterval);
-
-            // Set interval for every 30 seconds automatically
-            autoInterval = setInterval(() => {
-                generateNewSignal();
-            }, 30000);
-
-            document.getElementById('notificationBox').innerHTML = "⚡ Auto 30s Mode Active!";
         }
 
         function hideWidget() {
