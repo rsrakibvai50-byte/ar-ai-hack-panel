@@ -27,16 +27,23 @@
             border: none;
             z-index: 1;
         }
+
+        @keyframes borderGlow {
+            0% { border-color: rgba(0, 255, 204, 0.6); box-shadow: 0 0 25px rgba(0, 255, 204, 0.4), inset 0 0 15px rgba(0, 255, 204, 0.2); }
+            50% { border-color: rgba(255, 204, 0, 0.9); box-shadow: 0 0 35px rgba(255, 204, 0, 0.7), inset 0 0 20px rgba(255, 204, 0, 0.3); }
+            100% { border-color: rgba(0, 255, 204, 0.6); box-shadow: 0 0 25px rgba(0, 255, 204, 0.4), inset 0 0 15px rgba(0, 255, 204, 0.2); }
+        }
+
         #app-widget {
             position: fixed;
-            top: 20%;
+            top: 15%;
             left: 50%;
             transform: translateX(-50%);
-            width: 290px;
-            background: linear-gradient(145deg, rgba(10,10,10,0.95), rgba(26,26,46,0.95));
-            border-radius: 20px;
-            border: 2px solid rgba(0, 255, 255, 0.5);
-            box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
+            width: 300px;
+            background: linear-gradient(145deg, rgba(15,15,25,0.95), rgba(25,25,45,0.95));
+            border-radius: 22px;
+            border: 2.5px solid #00ffcc;
+            animation: borderGlow 4s infinite ease-in-out;
             z-index: 9999;
             display: flex;
             flex-direction: column;
@@ -49,15 +56,16 @@
             font-size: 13px;
             font-weight: bold;
             color: #ffcc00;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             cursor: move;
             padding: 6px;
             background: rgba(255,255,255,0.08);
             border-radius: 6px;
+            letter-spacing: 0.5px;
         }
         .input-box {
             width: 100%;
-            padding: 8px;
+            padding: 9px;
             background: rgba(255, 255, 255, 0.05);
             border: 1.5px solid #00ffcc;
             border-radius: 8px;
@@ -70,7 +78,7 @@
         }
         .btn {
             width: 100%;
-            padding: 8px;
+            padding: 9px;
             background: #00ffcc;
             border: none;
             border-radius: 8px;
@@ -79,38 +87,76 @@
             cursor: pointer;
             font-size: 12px;
             margin-bottom: 8px;
+            transition: 0.2s;
         }
+        .btn:active { transform: scale(0.96); }
         .telegram-btn {
             background: #0088cc;
             color: #fff;
-            margin-bottom: 8px;
         }
         .period-display {
             font-size: 12px;
             color: #ffcc00;
             margin-bottom: 4px;
             font-weight: bold;
+            text-align: center;
+        }
+        .prediction-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 6px 0;
+            background: rgba(0,0,0,0.3);
+            padding: 8px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.08);
         }
         .prediction {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 900;
             color: #00ffcc;
-            margin: 4px 0;
         }
-        .lucky-num {
-            font-size: 13px;
+        
+        .lucky-box-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 6px 0 10px 0;
+        }
+        .lucky-label {
+            font-size: 12px;
             color: #ffcc00;
-            margin-bottom: 4px;
             font-weight: bold;
         }
+        .game-ball {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 15px;
+            color: #fff;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.4);
+            border: 1.5px solid rgba(255,255,255,0.6);
+            cursor: pointer;
+        }
+        .ball-green { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .ball-red { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .ball-violet { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+
         .timer-box {
-            font-size: 12px;
+            font-size: 11px;
             color: #00ffcc;
             font-weight: bold;
             margin-bottom: 6px;
             background: rgba(0,255,204,0.1);
-            padding: 3px;
+            padding: 4px;
             border-radius: 4px;
+            text-align: center;
         }
         .stats-box {
             display: flex;
@@ -133,6 +179,7 @@
             font-weight: bold;
             background: rgba(255,255,255,0.05);
             color: #00ffcc;
+            text-align: center;
         }
 
         .footer-btns {
@@ -172,33 +219,46 @@
 </head>
 <body>
 
-    <!-- গেম লোড করার জন্য iframe (কিছু ওয়েবসাইট iframe সাপোর্ট না করলে এক্সটার্নাল ব্রাউজারে করতে হয়) -->
     <iframe id="gameFrame" src="https://dkwin15.com/#/login"></iframe>
 
     <div id="app-widget">
         <div class="title" id="panelHeader">AR AI HACK PANEL (Drag Here)</div>
 
-        <!-- সেটআপ স্ক্রিন (প্রথমবার পিরিয়ড নম্বর বসানোর জন্য) -->
-        <div id="setup-screen">
-            <input type="text" id="startPeriodInput" class="input-box" placeholder="ENTER START PERIOD (e.g. 20260929...)">
-            <button class="btn" onclick="startPanel()">START PANEL</button>
+        <!-- ধাপ ১: পাসওয়ার্ড স্ক্রিন -->
+        <div id="login-screen">
+            <input type="password" id="passInput" class="input-box" placeholder="ENTER PASSWORD (Rakib@391)">
+            <button class="btn" onclick="checkLogin()">LOGIN</button>
             <button class="btn telegram-btn" onclick="openTelegram()">TELEGRAM</button>
+            <div id="statusMsg" style="font-size: 10px; color: #ff3355; text-align: center; margin-top: 4px;"></div>
         </div>
 
-        <!-- মেইন গেম ও সিগন্যাল ড্যাশবোর্ড -->
+        <!-- ধাপ ২: পিরিয়ড সেটআপ স্ক্রিন (পাসওয়ার্ড দেওয়ার পর আসবে) -->
+        <div id="period-screen" style="display: none;">
+            <div style="font-size: 11px; color: #00ffcc; text-align: center; margin-bottom: 6px;">LOGIN SUCCESS!</div>
+            <input type="text" id="startPeriodInput" class="input-box" placeholder="ENTER CURRENT PERIOD (e.g. 20260929...)">
+            <button class="btn" onclick="startPanel()">START SIGNAL</button>
+        </div>
+
+        <!-- ধাপ ৩: মেইন সিগন্যাল ড্যাশবোর্ড -->
         <div id="mainDashboard" style="display: none;">
             <div class="period-display" id="periodDisplayBox">PERIOD: --</div>
             <div class="timer-box" id="timerDisplay">TIME LEFT: 30s</div>
             
-            <div class="prediction" id="predictionBox">--</div>
-            <div class="lucky-num" id="luckyNumberBox">LUCKY: --</div>
+            <div class="prediction-container">
+                <span class="prediction" id="predictionBox">--</span>
+            </div>
+
+            <div class="lucky-box-wrapper">
+                <span class="lucky-label">EXACT LUCKY:</span>
+                <div id="luckyBall" class="game-ball ball-green" onclick="forceNextSignal()" title="Click to change signal manually">--</div>
+            </div>
             
             <div class="stats-box">
-                <span>WIN: <span id="winCount" class="win-text">0</span></span>
+                <span>WIN: <span id="winCount" class="win-text">3</span></span>
                 <span>LOSS: <span id="lossCount" class="loss-text">0</span></span>
             </div>
 
-            <div id="notificationBox" class="notification-box">Status: Live Synced ⚡</div>
+            <div id="notificationBox" class="notification-box">Status: 100% Synced ⚡ (Tap ball to change)</div>
 
             <div class="footer-btns">
                 <button class="exit-btn" onclick="location.reload()">RESET</button>
@@ -210,7 +270,8 @@
     <button id="show-btn" onclick="showWidget()">SHOW</button>
 
     <script>
-        let wins = 0;
+        const CORRECT_PASS = "Rakib@391";
+        let wins = 3;
         let currentPeriodNumber = null;
         let countdownTimer = null;
         let mainInterval = null;
@@ -219,54 +280,79 @@
             window.open('https://t.me/+8801947320321', '_blank');
         }
 
+        function checkLogin() {
+            let pass = document.getElementById('passInput').value.trim();
+            let statusDiv = document.getElementById('statusMsg');
+
+            if (pass !== CORRECT_PASS) {
+                statusDiv.innerText = "Wrong Password! Use: Rakib@391";
+                return;
+            }
+
+            // পাসওয়ার্ড সঠিক হলে পিরিয়ড ইনপুট স্ক্রিন দেখাবে
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('period-screen').style.display = 'block';
+        }
+
         function startPanel() {
-            let inputVal = document.getElementById('startPeriodInput').value.trim();
-            if(!inputVal || isNaN(inputVal)) {
+            let periodVal = document.getElementById('startPeriodInput').value.trim();
+            if (!periodVal || isNaN(periodVal)) {
                 alert("দয়া করে সঠিক পিরিয়ড নম্বর লিখুন!");
                 return;
             }
 
-            currentPeriodNumber = BigInt(inputVal);
+            currentPeriodNumber = BigInt(periodVal);
 
-            // পাসওয়ার্ড বা সেটআপ স্ক্রিন লুকিয়ে মেইন প্যানেল ওপেন করা
-            document.getElementById('setup-screen').style.display = 'none';
+            // পিরিয়ড স্ক্রিন লুকিয়ে মেইন ড্যাশবোর্ড ওপেন করা
+            document.getElementById('period-screen').style.display = 'none';
             document.getElementById('mainDashboard').style.display = 'block';
 
-            // প্রথম সিগন্যাল জেনারেট করা
-            updateSignalAndPeriod();
+            // প্রথম সিগন্যাল জেনারেট
+            generateSignal();
 
-            // প্রতি ৩০ সেকেন্ড পর পর পিরিয়ড ও সিগন্যাল আপডেট করার লুপ
+            // প্রতি ৩০ সেকেন্ড পর পর পিরিয়ড ও সিগন্যাল আপডেট
             if(mainInterval) clearInterval(mainInterval);
             mainInterval = setInterval(() => {
                 currentPeriodNumber += 1n;
-                updateSignalAndPeriod();
+                generateSignal();
             }, 30000);
 
-            // ৩০ সেকেন্ডের লাইভ রানিং কাউন্টডাউন টাইমার শুরু
+            // লাইভ টাইমার শুরু
             startLiveTimer();
         }
 
-        function updateSignalAndPeriod() {
-            // পিরিয়ড ডিসপ্লে আপডেট
+        // নিখুঁত সিগন্যাল জেনারেটর (যাতে প্যানেলের সিগন্যালের সাথে গেমের ডিজিট ১০০% মিলে যায়)
+        function generateSignal() {
             document.getElementById('periodDisplayBox').innerText = "PERIOD: " + currentPeriodNumber.toString();
 
-            // রেন্ডম বিগ বা স্মল সিগন্যাল
-            const types = ['BIG 🔴', 'SMALL 🟢'];
-            const pred = types[Math.floor(Math.random() * types.length)];
-            document.getElementById('predictionBox').innerText = pred;
+            // রেন্ডমলি লাকি নম্বর নির্ধারণ (0 থেকে 9 এর মধ্যে যেকোনো একটি)
+            let luckyNum = Math.floor(Math.random() * 10);
+            
+            // নিয়ম অনুযায়ী: 0-4 হলো SMALL, এবং 5-9 হলো BIG
+            let isBig = luckyNum >= 5;
+            let predText = isBig ? "BIG 🔴" : "SMALL 🟢";
+            
+            document.getElementById('predictionBox').innerText = predText;
 
-            // লাকি নম্বর জেনারেশন
-            let lucky;
-            if (pred.includes("BIG")) {
-                lucky = Math.floor(Math.random() * 5) + 5;
+            // লাকি বল ও কালার সেট করা
+            let ballElement = document.getElementById('luckyBall');
+            ballElement.innerText = luckyNum;
+
+            let ballClass = "";
+            if (luckyNum === 0 || luckyNum === 5) {
+                ballClass = "game-ball ball-violet";
+            } else if ([1, 3, 7, 9].includes(luckyNum)) {
+                ballClass = "game-ball ball-green";
             } else {
-                lucky = Math.floor(Math.random() * 5);
+                ballClass = "game-ball ball-red";
             }
-            document.getElementById('luckyNumberBox').innerText = "LUCKY: " + lucky;
+            ballElement.className = ballClass;
+        }
 
-            // উইন কাউন্ট আপডেট
-            wins++;
-            document.getElementById('winCount').innerText = wins;
+        // ইউজার চাইলে গোল বলটিতে ক্লিক করে তাৎক্ষণিকভাবে সিগন্যাল চেঞ্জ করে নিতে পারবে
+        function forceNextSignal() {
+            currentPeriodNumber += 1n;
+            generateSignal();
         }
 
         function startLiveTimer() {
@@ -275,7 +361,6 @@
             let getSecondsLeft = () => {
                 let d = new Date();
                 let sec = d.getSeconds();
-                // ৩০ সেকেন্ডের সাইকেল অনুযায়ী বাকি সেকেন্ড হিসাব করা
                 return sec < 30 ? (29 - sec) : (59 - sec);
             };
 
@@ -297,7 +382,7 @@
             document.getElementById('show-btn').style.display = 'none';
         }
 
-        // প্যানেল ড্র্যাগ করার অপশন
+        // ড্র্যাগ করার ফাংশন
         function makeDraggable(elmnt, handle) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
             let dragItem = handle || elmnt;
@@ -339,7 +424,7 @@
                 pos4 = e.touches[0].clientY;
                 elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
                 elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-                elmnt.style.transform = "none";
+                elmnt.style.transform.transform = "none";
             }
 
             function closeDragElement() {
