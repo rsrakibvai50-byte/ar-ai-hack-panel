@@ -17,61 +17,45 @@
             overflow: hidden;
             background: #0b0f19;
             font-family: sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
         }
-        .bg-panel {
-            text-align: center;
-            padding: 20px;
+        /* Background Game Iframe */
+        #gameFrame {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
             z-index: 1;
         }
-        .bg-panel h2 {
-            color: #00ffcc;
-            font-size: 18px;
-            margin-bottom: 8px;
-        }
-        .bg-panel p {
-            color: #888;
-            font-size: 12px;
-            margin-bottom: 15px;
-        }
-        .game-link-btn {
-            padding: 12px 25px;
-            background: #ffcc00;
-            color: #000;
-            font-weight: bold;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 13px;
-            box-shadow: 0 0 15px rgba(255, 204, 0, 0.4);
-        }
+        /* Floating AI Hack Panel Widget */
         #app-widget {
             position: fixed;
-            top: 50%;
+            top: 20%;
             left: 50%;
-            transform: translate(-50%, -50%);
-            width: 260px;
-            background: linear-gradient(145deg, #0a0a0a, #1a1a2e);
+            transform: translateX(-50%);
+            width: 280px;
+            background: linear-gradient(145deg, rgba(10,10,10,0.95), rgba(26,26,46,0.95));
             border-radius: 20px;
-            border: 2px solid rgba(0, 255, 255, 0.3);
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+            border: 2px solid rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
             z-index: 9999;
             display: flex;
             flex-direction: column;
             padding: 15px;
             color: #fff;
+            touch-action: none;
         }
         .title {
             text-align: center;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             color: #ffcc00;
             margin-bottom: 10px;
             cursor: move;
+            padding: 6px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 6px;
         }
         .input-box {
             width: 100%;
@@ -107,26 +91,48 @@
             text-align: center;
         }
         .prediction {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 900;
             color: #00ffcc;
-            margin: 5px 0;
+            margin: 4px 0;
         }
         .lucky-num {
-            font-size: 14px;
+            font-size: 13px;
             color: #ffcc00;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             font-weight: bold;
         }
         .timer {
-            font-size: 14px;
+            font-size: 13px;
             color: #ffcc00;
             margin-top: 2px;
+            margin-bottom: 8px;
         }
+        .stats-box {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0,0,0,0.4);
+            padding: 6px;
+            border-radius: 6px;
+            font-size: 11px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .win-text { color: #00ffcc; font-weight: bold; }
+        .loss-text { color: #ff3355; font-weight: bold; }
+        
+        .notification-box {
+            font-size: 11px;
+            padding: 5px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-weight: bold;
+            background: rgba(255,255,255,0.05);
+        }
+
         .footer-btns {
             display: flex;
-            gap: 10px;
-            margin-top: 15px;
+            gap: 8px;
         }
         .footer-btns button {
             flex: 1;
@@ -152,23 +158,21 @@
             height: 50px;
             font-weight: bold;
             font-size: 11px;
-            cursor: move;
-            z-index: 9998;
+            cursor: pointer;
+            z-index: 10000;
             display: none;
             box-shadow: 0 0 15px rgba(0,255,204,0.5);
         }
     </style>
 </head>
 <body>
-    <div class="bg-panel">
-        <h2>AR AI HACK PANEL</h2>
-        <p>Click below to open the official game site in browser and login with your old ID.</p>
-        <button class="game-link-btn" onclick="openGameSite()">OPEN GAME SITE</button>
-    </div>
+
+    <!-- Background Auto Game Site Iframe -->
+    <iframe id="gameFrame" src="https://dkwin15.com/#/login"></iframe>
 
     <!-- Floating AI Hack Panel Widget -->
     <div id="app-widget">
-        <div class="title" id="panelHeader">AR AI HACK PANEL</div>
+        <div class="title" id="panelHeader">AR AI HACK PANEL (Drag Here)</div>
 
         <!-- Login Screen with Password -->
         <div id="login-screen">
@@ -180,11 +184,18 @@
 
         <!-- Dashboard -->
         <div id="mainDashboard">
-            <div id="periodDisplay" style="font-size: 11px; color: #888;">PERIOD: --</div>
+            <div id="periodDisplay" style="font-size: 10px; color: #aaa;">PERIOD: --</div>
             <div class="prediction" id="predictionBox">--</div>
             <div class="lucky-num" id="luckyNumberBox">LUCKY: --</div>
             <div class="timer" id="timerDisplay">00:30</div>
-            <button class="btn" style="margin-top: 8px;" onclick="openGameSite()">OPEN GAME</button>
+            
+            <div class="stats-box">
+                <span>WIN: <span id="winCount" class="win-text">0</span></span>
+                <span>LOSS: <span id="lossCount" class="loss-text">0</span></span>
+            </div>
+
+            <div id="notificationBox" class="notification-box" style="color: #ffcc00;">Status: Waiting...</div>
+
             <div class="footer-btns">
                 <button class="exit-btn" onclick="location.reload()">EXIT</button>
                 <button class="hide-btn" onclick="hideWidget()">HIDE</button>
@@ -197,10 +208,9 @@
     <script>
         const CORRECT_PASS = "Rakib@391";
         let lastPeriod = "";
-
-        function openGameSite() {
-            window.open('https://dkwin15.com/#/login', '_blank');
-        }
+        let wins = 0;
+        let losses = 0;
+        let currentPrediction = "BIG";
 
         function checkLogin() {
             const pass = document.getElementById('passInput').value.trim();
@@ -226,7 +236,6 @@
                 
                 document.getElementById('timerDisplay').innerText = "00:" + (remain < 10 ? "0" : "") + remain;
                 
-                // Synchronizing period calculation with standard 30s game intervals
                 const totalSeconds = Math.floor(now.getTime() / 1000);
                 const periodIndex = Math.floor(totalSeconds / 30);
                 const currentPeriod = String(now.getFullYear()) + 
@@ -237,14 +246,32 @@
                 document.getElementById('periodDisplay').innerText = "PERIOD: " + currentPeriod;
 
                 if (currentPeriod !== lastPeriod) {
+                    if (lastPeriod !== "") {
+                        let actualResult = Math.random() > 0.4 ? currentPrediction : (currentPrediction === "BIG" ? "SMALL" : "BIG");
+                        let notifBox = document.getElementById('notificationBox');
+                        
+                        if (actualResult === currentPrediction) {
+                            wins++;
+                            document.getElementById('winCount').innerText = wins;
+                            notifBox.innerHTML = "🎉 WIN! Result matched";
+                            notifBox.style.color = "#00ffcc";
+                        } else {
+                            losses++;
+                            document.getElementById('lossCount').innerText = losses;
+                            notifBox.innerHTML = "❌ LOSS! Result did not match";
+                            notifBox.style.color = "#ff3355";
+                        }
+                    }
+
                     lastPeriod = currentPeriod;
-                    
                     const types = ['BIG 🔴', 'SMALL 🟢'];
                     const pred = types[Math.floor(Math.random() * types.length)];
+                    currentPrediction = pred.includes("BIG") ? "BIG" : "SMALL";
+                    
                     document.getElementById('predictionBox').innerText = pred;
 
                     let lucky;
-                    if (pred.includes("BIG")) {
+                    if (currentPrediction === "BIG") {
                         lucky = Math.floor(Math.random() * 5) + 5;
                     } else {
                         lucky = Math.floor(Math.random() * 5);
@@ -264,15 +291,15 @@
             document.getElementById('show-btn').style.display = 'none';
         }
 
+        // Draggable logic for touch & mouse
         function makeDraggable(elmnt, handle) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
             let dragItem = handle || elmnt;
 
             dragItem.onmousedown = dragMouseDown;
-            dragItem.addEventListener('touchstart', dragTouchStart, { passive: true });
+            dragItem.addEventListener('touchstart', dragTouchStart, { passive: false });
 
             function dragMouseDown(e) {
-                e = e || window.event;
                 e.preventDefault();
                 pos3 = e.clientX;
                 pos4 = e.clientY;
@@ -281,7 +308,6 @@
             }
 
             function elementDrag(e) {
-                e = e || window.event;
                 e.preventDefault();
                 pos1 = pos3 - e.clientX;
                 pos2 = pos4 - e.clientY;
@@ -290,18 +316,17 @@
                 elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
                 elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
                 elmnt.style.transform = "none";
-                elmnt.style.bottom = "auto";
-                elmnt.style.right = "auto";
             }
 
             function dragTouchStart(e) {
                 pos3 = e.touches[0].clientX;
                 pos4 = e.touches[0].clientY;
-                document.addEventListener('touchend', closeDragElement);
-                document.addEventListener('touchmove', elementTouchDrag, { passive: true });
+                document.addEventListener('touchend', closeDragElement, { passive: false });
+                document.addEventListener('touchmove', elementTouchDrag, { passive: false });
             }
 
             function elementTouchDrag(e) {
+                e.preventDefault();
                 pos1 = pos3 - e.touches[0].clientX;
                 pos2 = pos4 - e.touches[0].clientY;
                 pos3 = e.touches[0].clientX;
@@ -309,8 +334,6 @@
                 elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
                 elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
                 elmnt.style.transform = "none";
-                elmnt.style.bottom = "auto";
-                elmnt.style.right = "auto";
             }
 
             function closeDragElement() {
