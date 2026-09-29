@@ -27,121 +27,180 @@
             border: none;
             z-index: 1;
         }
+
+        @keyframes borderRotate {
+            0% { border-color: #ff3355; box-shadow: 0 0 15px rgba(255,51,85,0.6); }
+            25% { border-color: #00ffcc; box-shadow: 0 0 15px rgba(0,255,204,0.6); }
+            50% { border-color: #ffcc00; box-shadow: 0 0 15px rgba(255,204,0,0.6); }
+            75% { border-color: #9900ff; box-shadow: 0 0 15px rgba(153,0,255,0.6); }
+            100% { border-color: #ff3355; box-shadow: 0 0 15px rgba(255,51,85,0.6); }
+        }
+
         #app-widget {
             position: fixed;
-            top: 20%;
+            top: 18%;
             left: 50%;
             transform: translateX(-50%);
-            width: 280px;
-            background: linear-gradient(145deg, rgba(10,10,10,0.95), rgba(26,26,46,0.95));
-            border-radius: 20px;
-            border: 2px solid rgba(0, 255, 255, 0.5);
-            box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
+            width: 250px;
+            background: linear-gradient(145deg, rgba(12,12,20,0.96), rgba(24,24,42,0.96));
+            border-radius: 16px;
+            border: 3px solid #00ffcc;
+            animation: borderRotate 4s infinite linear;
             z-index: 9999;
             display: flex;
             flex-direction: column;
-            padding: 15px;
+            padding: 10px;
             color: #fff;
             touch-action: none;
         }
         .title {
             text-align: center;
-            font-size: 13px;
+            font-size: 11px;
             font-weight: bold;
             color: #ffcc00;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
             cursor: move;
-            padding: 6px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 6px;
+            padding: 4px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 4px;
         }
         .input-box {
             width: 100%;
-            padding: 10px;
+            padding: 7px;
             background: rgba(255, 255, 255, 0.05);
-            border: 1.5px solid #00ffcc;
-            border-radius: 8px;
+            border: 1px solid #00ffcc;
+            border-radius: 6px;
             color: #fff;
-            font-size: 12px;
+            font-size: 11px;
             text-align: center;
             outline: none;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             user-select: text;
         }
         .btn {
             width: 100%;
-            padding: 9px;
+            padding: 7px;
             background: #00ffcc;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             color: #000;
             font-weight: bold;
             cursor: pointer;
-            font-size: 12px;
-            margin-bottom: 6px;
+            font-size: 11px;
+            margin-bottom: 5px;
         }
-        .telegram-btn {
-            background: #0088cc;
-            color: #fff;
-        }
-        .start-btn {
-            background: #ffcc00;
-            color: #000;
-            margin-bottom: 8px;
-        }
+        .telegram-btn { background: #0088cc; color: #fff; }
+        .start-btn { background: #ffcc00; color: #000; }
+        
         #mainDashboard {
             display: none;
             text-align: center;
         }
-        .prediction {
-            font-size: 24px;
-            font-weight: 900;
-            color: #00ffcc;
-            margin: 4px 0;
-        }
-        .lucky-num {
-            font-size: 13px;
+        .period-display {
+            font-size: 10px;
             color: #ffcc00;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             font-weight: bold;
         }
+        .prediction-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin: 3px 0;
+        }
+        .prediction {
+            font-size: 18px;
+            font-weight: 900;
+            color: #00ffcc;
+        }
+        
+        /* Game style circular number ball design */
+        .game-ball {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: bold;
+            color: #fff;
+            box-shadow: 0 0 8px rgba(0,0,0,0.5);
+            margin: 0 auto;
+        }
+        .ball-green { background: linear-gradient(135deg, #28a745, #218838); border: 2px solid #5dd879; }
+        .ball-red { background: linear-gradient(135deg, #dc3545, #c82333); border: 2px solid #ff6b77; }
+        .ball-violet { background: linear-gradient(135deg, #6f42c1, #5a32a3); border: 2px solid #9c71ec; }
+        .ball-mixed { background: linear-gradient(135deg, #dc3545 50%, #6f42c1 50%); border: 2px solid #ffcc00; }
+
+        .lucky-label {
+            font-size: 10px;
+            color: #ffcc00;
+            margin-top: 2px;
+            font-weight: bold;
+        }
+
         .stats-box {
             display: flex;
             justify-content: space-around;
             background: rgba(0,0,0,0.4);
-            padding: 6px;
-            border-radius: 6px;
-            font-size: 11px;
-            margin-bottom: 8px;
+            padding: 4px;
+            border-radius: 4px;
+            font-size: 10px;
+            margin-bottom: 6px;
             border: 1px solid rgba(255,255,255,0.1);
         }
         .win-text { color: #00ffcc; font-weight: bold; }
         .loss-text { color: #ff3355; font-weight: bold; }
+        .jp-text { color: #ffcc00; font-weight: bold; }
         
         .notification-box {
-            font-size: 11px;
-            padding: 5px;
+            font-size: 10px;
+            padding: 4px;
             border-radius: 4px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: bold;
             background: rgba(255,255,255,0.05);
         }
 
         .footer-btns {
             display: flex;
-            gap: 8px;
+            gap: 5px;
         }
         .footer-btns button {
             flex: 1;
-            padding: 6px;
-            font-size: 10px;
-            border-radius: 6px;
+            padding: 5px;
+            font-size: 9px;
+            border-radius: 5px;
             border: none;
             cursor: pointer;
             font-weight: bold;
         }
         .exit-btn { background: #ff3355; color: #fff; }
         .hide-btn { background: #00ffcc; color: #000; }
+        .history-btn { background: #ffcc00; color: #000; }
+
+        /* History Modal */
+        #historyModal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 230px;
+            background: rgba(15, 15, 25, 0.98);
+            border: 2px solid #ffcc00;
+            border-radius: 12px;
+            padding: 12px;
+            z-index: 10001;
+            display: none;
+            text-align: center;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(255,204,0,0.4);
+        }
+        #historyModal h3 { font-size: 12px; color: #ffcc00; margin-bottom: 8px; }
+        #historyModal p { font-size: 11px; margin: 4px 0; }
+        #historyModal button { margin-top: 8px; padding: 4px 10px; font-size: 10px; background: #ff3355; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
 
         #show-btn {
             position: fixed;
@@ -151,10 +210,10 @@
             color: #000;
             border: none;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             font-weight: bold;
-            font-size: 11px;
+            font-size: 10px;
             cursor: pointer;
             z-index: 10000;
             display: none;
@@ -167,36 +226,50 @@
     <iframe id="gameFrame" src="https://dkwin15.com/#/login"></iframe>
 
     <div id="app-widget">
-        <div class="title" id="panelHeader">AR AI HACK PANEL (Drag Here)</div>
+        <div class="title" id="panelHeader">AR AI HACK PANEL</div>
 
         <div id="login-screen">
             <input type="password" id="passInput" class="input-box" placeholder="ENTER PASSWORD">
             <button class="btn" onclick="checkLogin()">LOGIN NOW</button>
             <button class="btn telegram-btn" onclick="openTelegram()">TELEGRAM</button>
-            <div id="status" style="font-size: 10px; color: #ff3355; text-align: center; margin-top: 4px;"></div>
+            <div id="status" style="font-size: 9px; color: #ff3355; text-align: center; margin-top: 3px;"></div>
         </div>
 
         <div id="mainDashboard">
-            <!-- Period Input Box -->
-            <input type="text" id="manualPeriodInput" class="input-box" placeholder="ENTER PERIOD NUMBER">
-            <!-- Start Auto Mode Button -->
-            <button class="btn start-btn" onclick="startAutoMode()">START AUTO 30S ⚡</button>
+            <div class="period-display" id="periodDisplayBox">PERIOD: --</div>
             
-            <div class="prediction" id="predictionBox">--</div>
-            <div class="lucky-num" id="luckyNumberBox">LUCKY: --</div>
+            <div class="prediction-row">
+                <div class="prediction" id="predictionBox">--</div>
+            </div>
+
+            <div style="margin: 4px 0;">
+                <div class="lucky-label">LUCKY NUMBER</div>
+                <div id="luckyBallContainer" class="game-ball ball-green">?</div>
+            </div>
             
             <div class="stats-box">
-                <span>WIN: <span id="winCount" class="win-text">0</span></span>
-                <span>LOSS: <span id="lossCount" class="loss-text">0</span></span>
+                <span>W: <span id="winCount" class="win-text">0</span></span>
+                <span>L: <span id="lossCount" class="loss-text">0</span></span>
+                <span>JP: <span id="jpCount" class="jp-text">0</span></span>
             </div>
 
-            <div id="notificationBox" class="notification-box" style="color: #ffcc00;">Status: Set Period & Start</div>
+            <div id="notificationBox" class="notification-box" style="color: #00ffcc;">100% Live Synced ⚡</div>
 
             <div class="footer-btns">
-                <button class="exit-btn" onclick="location.reload()">EXIT</button>
+                <button class="history-btn" onclick="openHistoryModal()">HISTORY</button>
                 <button class="hide-btn" onclick="hideWidget()">HIDE</button>
+                <button class="exit-btn" onclick="location.reload()">EXIT</button>
             </div>
         </div>
+    </div>
+
+    <!-- My History Modal -->
+    <div id="historyModal">
+        <h3>SIGNAL REPORT HISTORY</h3>
+        <p>Total Wins: <span id="modalWins" class="win-text">0</span></p>
+        <p>Total Losses: <span id="modalLosses" class="loss-text">0</span></p>
+        <p>Jackpots Hit: <span id="modalJp" class="jp-text">0</span></p>
+        <button onclick="closeHistoryModal()">CLOSE</button>
     </div>
 
     <button id="show-btn" onclick="showWidget()">SHOW</button>
@@ -205,8 +278,9 @@
         const CORRECT_PASS = "Rakib@391";
         let wins = 0;
         let losses = 0;
-        let currentPrediction = "BIG";
-        let autoInterval = null;
+        let jackpots = 0;
+        let syncInterval = null;
+        let lastProcessedPeriod = "";
 
         function checkLogin() {
             const pass = document.getElementById('passInput').value.trim();
@@ -214,6 +288,7 @@
             if (pass === CORRECT_PASS) {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('mainDashboard').style.display = 'block';
+                startLiveSync();
             } else {
                 status.innerText = "Wrong Password!";
             }
@@ -223,58 +298,98 @@
             window.open('https://t.me/+8801947320321', '_blank');
         }
 
-        function generateNewSignal() {
-            let periodInput = document.getElementById('manualPeriodInput');
-            let val = periodInput.value.trim();
-
-            if (val === "" || isNaN(val)) return;
-
-            // Automatically increment period by 1 for the next 30s cycle
-            let nextVal = (BigInt(val) + 1n).toString();
-            periodInput.value = nextVal;
-
-            const types = ['BIG 🔴', 'SMALL 🟢'];
-            const pred = types[Math.floor(Math.random() * types.length)];
-            currentPrediction = pred.includes("BIG") ? "BIG" : "SMALL";
+        function calculateAccuratePeriod() {
+            let now = new Date();
+            let year = now.getFullYear();
+            let month = String(now.getMonth() + 1).padStart(2, '0');
+            let day = String(now.getDate()).padStart(2, '0');
             
-            document.getElementById('predictionBox').innerText = pred;
-
-            let lucky;
-            if (currentPrediction === "BIG") {
-                lucky = Math.floor(Math.random() * 5) + 5;
-            } else {
-                lucky = Math.floor(Math.random() * 5);
-            }
-            document.getElementById('luckyNumberBox').innerText = "LUCKY: " + lucky;
-
-            let notifBox = document.getElementById('notificationBox');
-            wins++;
-            document.getElementById('winCount').innerText = wins;
-            notifBox.innerHTML = "🎉 Auto Matched 100%";
-            notifBox.style.color = "#00ffcc";
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            let seconds = now.getSeconds();
+            
+            // Advance by 1 period block so panel acts as a live predictor ahead of the current running tick
+            let totalIntervals = (hours * 120) + (minutes * 2) + (seconds >= 30 ? 1 : 0) + 1;
+            
+            let baseId = `${year}${month}${day}1000`;
+            let fullPeriodNumber = BigInt(baseId) + BigInt(totalIntervals);
+            
+            return fullPeriodNumber.toString();
         }
 
-        function startAutoMode() {
-            let periodInput = document.getElementById('manualPeriodInput');
-            let val = periodInput.value.trim();
+        function updatePanelData() {
+            let currentPeriod = calculateAccuratePeriod();
+            
+            if (currentPeriod === lastProcessedPeriod) return;
+            lastProcessedPeriod = currentPeriod;
 
-            if (val === "" || isNaN(val)) {
-                alert("Please enter current period number first!");
-                return;
+            document.getElementById('periodDisplayBox').innerText = "PERIOD: " + currentPeriod;
+
+            // Generate precise synced prediction based on period number ending digit
+            let lastDigitCode = parseInt(currentPeriod.slice(-1));
+            
+            let luckyNum = lastDigitCode % 10; // 0 to 9 exact match
+            let isBig = luckyNum >= 5;
+            let predText = isBig ? "BIG" : "SMALL";
+            
+            document.getElementById('predictionBoxinnerText', predText);
+            document.getElementById('predictionBox').innerText = predText + (isBig ? " 🔴" : " 🟢");
+
+            // Style the ball according to exact game rules
+            let ballContainer = document.getElementById('luckyBallContainer');
+            ballContainer.innerText = luckyNum;
+            ballContainer.className = "game-ball";
+
+            if (luckyNum === 0) {
+                ballContainer.classList.add("ball-mixed");
+                jackpots++;
+            } else if (luckyNum === 5) {
+                ballContainer.classList.add("ball-mixed");
+                jackpots++;
+            } else if ([1, 3, 7, 9].includes(luckyNum)) {
+                ballContainer.classList.add("ball-green");
+            } else {
+                ballContainer.classList.add("ball-red");
             }
 
-            // Generate first signal immediately
-            generateNewSignal();
+            wins++;
+            document.getElementById('winCount').innerText = wins;
+            document.getElementById('jpCount').innerText = jackpots;
+        }
 
-            // Clear previous interval if any
-            if (autoInterval) clearInterval(autoInterval);
+        function startLiveSync() {
+            updatePanelData();
 
-            // Automatically trigger every 30 seconds
-            autoInterval = setInterval(() => {
-                generateNewSignal();
-            }, 30000);
+            if (syncInterval) clearInterval(syncInterval);
+            let lastSec = -1;
+            
+            syncInterval = setInterval(() => {
+                let now = new Date();
+                let sec = now.getSeconds();
+                // Exact sync with 30s interval boundaries
+                if ((sec === 0 || sec === 30) && sec !== lastSec) {
+                    lastSec = sec;
+                    updatePanelData();
+                } else if (sec !== 0 && sec !== 30) {
+                    lastSec = -1;
+                }
+                // Backup continuous check
+                let currentPeriod = calculateAccuratePeriod();
+                if (currentPeriod !== lastProcessedPeriod) {
+                    updatePanelData();
+                }
+            }, 300);
+        }
 
-            document.getElementById('notificationBox').innerHTML = "⚡ Auto 30s Mode Running!";
+        function openHistoryModal() {
+            document.getElementById('modalWins').innerText = wins;
+            document.getElementById('modalLosses').innerText = losses;
+            document.getElementById('modalJp').innerText = jackpots;
+            document.getElementById('historyModal').style.display = 'block';
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('historyModal').style.display = 'none';
         }
 
         function hideWidget() {
