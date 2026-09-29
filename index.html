@@ -137,34 +137,13 @@
             color: #ffcc00;
             margin-top: 2px;
             font-weight: bold;
-        }
-
-        .stats-box {
-            display: flex;
-            justify-content: space-around;
-            background: rgba(0,0,0,0.4);
-            padding: 4px;
-            border-radius: 4px;
-            font-size: 10px;
             margin-bottom: 6px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .win-text { color: #00ffcc; font-weight: bold; }
-        .loss-text { color: #ff3355; font-weight: bold; }
-        .jp-text { color: #ffcc00; font-weight: bold; }
-        
-        .notification-box {
-            font-size: 10px;
-            padding: 4px;
-            border-radius: 4px;
-            margin-bottom: 6px;
-            font-weight: bold;
-            background: rgba(255,255,255,0.05);
         }
 
         .footer-btns {
             display: flex;
             gap: 5px;
+            margin-top: 6px;
         }
         .footer-btns button {
             flex: 1;
@@ -184,20 +163,34 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 230px;
+            width: 260px;
+            max-height: 350px;
+            overflow-y: auto;
             background: rgba(15, 15, 25, 0.98);
             border: 2px solid #ffcc00;
             border-radius: 12px;
-            padding: 12px;
+            padding: 10px;
             z-index: 10001;
             display: none;
-            text-align: center;
             color: #fff;
             box-shadow: 0 0 20px rgba(255,204,0,0.4);
         }
-        #historyModal h3 { font-size: 12px; color: #ffcc00; margin-bottom: 8px; }
-        #historyModal p { font-size: 11px; margin: 4px 0; }
-        #historyModal button { margin-top: 8px; padding: 4px 10px; font-size: 10px; background: #ff3355; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+        #historyModal h3 { font-size: 12px; color: #ffcc00; margin-bottom: 8px; text-align: center; }
+        .history-item {
+            font-size: 10px;
+            background: rgba(255,255,255,0.05);
+            margin: 4px 0;
+            padding: 6px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-item span { font-weight: bold; }
+        .win-tag { color: #00ffcc; }
+        .loss-tag { color: #ff3355; }
+        
+        #historyModal button { margin-top: 8px; width: 100%; padding: 5px; font-size: 10px; background: #ff3355; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
 
         #show-btn {
             position: fixed;
@@ -227,6 +220,7 @@
 
         <div id="login-screen">
             <input type="password" id="passInput" class="input-box" placeholder="ENTER PASSWORD">
+            <input type="text" id="startPeriodInput" class="input-box" placeholder="PASTE CURRENT PERIOD (e.g. 20260929...)">
             <button class="btn" onclick="checkLogin()">LOGIN NOW</button>
             <button class="btn telegram-btn" onclick="openTelegram()">TELEGRAM</button>
             <div id="status" style="font-size: 9px; color: #ff3355; text-align: center; margin-top: 3px;"></div>
@@ -244,14 +238,6 @@
                 <div class="lucky-label">LUCKY NUMBER</div>
                 <div id="luckyBallContainer" class="game-ball ball-green">?</div>
             </div>
-            
-            <div class="stats-box">
-                <span>W: <span id="winCount" class="win-text">0</span></span>
-                <span>L: <span id="lossCount" class="loss-text">0</span></span>
-                <span>JP: <span id="jpCount" class="jp-text">0</span></span>
-            </div>
-
-            <div id="notificationBox" class="notification-box" style="color: #00ffcc;">Accuracy: 98.5% ⚡</div>
 
             <div class="footer-btns">
                 <button class="history-btn" onclick="openHistoryModal()">HISTORY</button>
@@ -262,10 +248,8 @@
     </div>
 
     <div id="historyModal">
-        <h3>SIGNAL REPORT HISTORY</h3>
-        <p>Total Wins: <span id="modalWins" class="win-text">0</span></p>
-        <p>Total Losses: <span id="modalLosses" class="loss-text">0</span></p>
-        <p>Jackpots Hit: <span id="modalJp" class="jp-text">0</span></p>
+        <h3>SIGNAL HISTORY</h3>
+        <div id="historyListContainer"></div>
         <button onclick="closeHistoryModal()">CLOSE</button>
     </div>
 
@@ -273,60 +257,65 @@
 
     <script>
         const CORRECT_PASS = "Rakib@391";
-        let wins = 15;
-        let losses = 0;
-        let jackpots = 4;
         let syncInterval = null;
-        let lastProcessedPeriod = "";
+        let currentActivePeriod = null;
+        let lastSecond = -1;
+        let historyLogs = [];
 
         function checkLogin() {
             const pass = document.getElementById('passInput').value.trim();
+            const periodInput = document.getElementById('startPeriodInput').value.trim();
             const status = document.getElementById('status');
-            if (pass === CORRECT_PASS) {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('mainDashboard').style.display = 'block';
-                startLiveSync();
-            } else {
+            
+            if (pass !== CORRECT_PASS) {
                 status.innerText = "Wrong Password!";
+                return;
             }
+            if (!periodInput || isNaN(periodInput)) {
+                status.innerText = "Enter valid starting period!";
+                return;
+            }
+
+            currentActivePeriod = BigInt(periodInput);
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('mainDashboard').style.display = 'block';
+            startLiveSync();
         }
 
         function openTelegram() {
             window.open('https://t.me/+8801947320321', '_blank');
         }
 
-        function getGamePeriodAndTimer() {
-            let now = new Date();
-            let year = now.getFullYear();
-            let month = String(now.getMonth() + 1).padStart(2, '0');
-            let day = String(now.getDate()).padStart(2, '0');
+        function startLiveSync() {
+            updatePanelData();
+
+            if (syncInterval) clearInterval(syncInterval);
             
-            // UTC time ba local time er sathe exact 30s interval match koranor jonno calculation
-            let totalSecondsToday = (now.getHours() * 3600) + (now.getMinutes() * 60) + now.getSeconds();
-            let totalIntervals = Math.floor(totalSecondsToday / 30) + 1;
-            let remainingSeconds = 30 - (totalSecondsToday % 30);
-            
-            // Game er original format: YYYYMMDD1000 + serial
-            let baseId = `${year}${month}${day}100052000`; 
-            let fullPeriodNumber = BigInt(baseId) + BigInt(totalIntervals);
-            
-            return {
-                period: fullPeriodNumber.toString(),
-                timer: remainingSeconds
-            };
+            syncInterval = setInterval(() => {
+                let now = new Date();
+                let sec = now.getSeconds();
+                let remainingSeconds = 30 - (sec % 30);
+                
+                document.getElementById('timerDisplayBox').innerText = "TIMER: " + remainingSeconds + "s";
+
+                let currentCycle = Math.floor(sec / 30);
+                if (lastSecond !== currentCycle) {
+                    lastSecond = currentCycle;
+                    if (currentActivePeriod !== null) {
+                        currentActivePeriod += 1n; // Auto increase period by 1
+                        updatePanelData();
+                    }
+                }
+            }, 500);
         }
 
         function updatePanelData() {
-            let gameData = getGamePeriodAndTimer();
-            let currentPeriod = gameData.period;
+            if (currentActivePeriod === null) return;
+            let periodStr = currentActivePeriod.toString();
             
-            document.getElementById('periodDisplayBox').innerText = "PERIOD: " + currentPeriod;
-            document.getElementById('timerDisplayBox').innerText = "TIMER: " + gameData.timer + "s";
-            
-            if (currentPeriod === lastProcessedPeriod) return;
-            lastProcessedPeriod = currentPeriod;
+            document.getElementById('periodDisplayBox').innerText = "PERIOD: " + periodStr;
 
-            let lastDigitCode = parseInt(currentPeriod.slice(-1));
+            let lastDigitCode = parseInt(periodStr.slice(-1));
             let luckyNum = lastDigitCode % 10;
             let isBig = luckyNum >= 5;
             let predText = isBig ? "BIG" : "SMALL";
@@ -339,32 +328,48 @@
 
             if (luckyNum === 0 || luckyNum === 5) {
                 ballContainer.classList.add("ball-mixed");
-                jackpots++;
             } else if ([1, 3, 7, 9].includes(luckyNum)) {
                 ballContainer.classList.add("ball-green");
             } else {
                 ballContainer.classList.add("ball-red");
             }
 
-            wins++;
-            document.getElementById('winCount').innerText = wins;
-            document.getElementById('jpCount').innerText = jackpots;
-        }
+            // History te log save kora (Simulated Win/Loss based on number pattern)
+            let isWin = (luckyNum % 2 === 0 && !isBig) || (luckyNum % 2 !== 0 && isBig) || (luckyNum === 0 || luckyNum === 5);
+            let resultStatus = isWin ? "WIN" : "LOSS";
 
-        function startLiveSync() {
-            updatePanelData();
+            historyLogs.unshift({
+                period: periodStr,
+                prediction: predText,
+                number: luckyNum,
+                status: resultStatus
+            });
 
-            if (syncInterval) clearInterval(syncInterval);
-            
-            syncInterval = setInterval(() => {
-                updatePanelData();
-            }, 1000);
+            if (historyLogs.length > 20) historyLogs.pop(); // Keep last 20 records
         }
 
         function openHistoryModal() {
-            document.getElementById('modalWins').innerText = wins;
-            document.getElementById('modalLosses').innerText = losses;
-            document.getElementById('modalJp').innerText = jackpots;
+            let container = document.getElementById('historyListContainer');
+            container.innerHTML = "";
+
+            if (historyLogs.length === 0) {
+                container.innerHTML = "<p style='text-align:center; font-size:10px; margin:10px;'>No history available yet.</p>";
+            } else {
+                historyLogs.forEach(item => {
+                    let div = document.createElement('div');
+                    div.className = 'history-item';
+                    let statusClass = item.status === "WIN" ? "win-tag" : "loss-tag";
+                    div.innerHTML = `
+                        <div>
+                            <span style="color:#ffcc00;">${item.period}</span><br>
+                            <span>${item.prediction} (${item.number})</span>
+                        </div>
+                        <span class="${statusClass}">${item.status}</span>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+
             document.getElementById('historyModal').style.display = 'block';
         }
 
@@ -435,7 +440,7 @@
         }
 
         makeDraggable(document.getElementById("app-widget"), document.getElementById("panelHeader"));
-        makeDraggable(database = document.getElementById("show-btn"));
+        makeDraggable(document.getElementById("show-btn"));
     </script>
 </body>
 </html>
